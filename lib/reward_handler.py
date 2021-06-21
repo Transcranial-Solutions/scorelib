@@ -10,7 +10,17 @@ class RewardHandler:
     Used within the contract that keeps track of eligible balances.
     """
 
-    def __init__(self, name: str, rscore_decimals: int, db: IconScoreDatabase, isb: IconScoreBase, token_type: TokenType = TokenType.irc2):
+    def __init__(self, name: str, db: IconScoreDatabase, isb: IconScoreBase, rscore_decimals: int = 18, token_type: TokenType = TokenType.irc2):
+        """
+        Initialization
+
+        Parameters:
+        name            :  Name to differentiate between databases if several rewardhandlers are used in the same contract.
+        db              :  Database instance used to store persistent data.
+        isb             :  Contract instance of the contract this class is used in.
+        rscore_decimals :  Specifies how small unit rewards should be measured in.
+        token_type      :  Specifies which type of token the rewards are in.
+        """
         self._reward_rate = VarDB(f"{name}_sum_reward_rate", db, int)
         self._entry_reward_rate = DictDB(f"{name}_entry_reward_rate", db, int)
         self._rewards = DictDB(f"{name}_rewards", db, int)
