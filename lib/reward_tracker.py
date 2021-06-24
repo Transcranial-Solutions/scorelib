@@ -2,7 +2,7 @@ from iconservice import *
 
 class RewardTracker:
     """
-    Handles reward distributiona and reward tracking. Used within the contract that keeps track of rewards eligible balances.
+    Handles reward distribution and reward tracking. Used within the contract that keeps track of reward eligible balances.
     """
 
     def __init__(self, name: str, db: IconScoreDatabase, isb: IconScoreBase, rscore_decimals: int = 18):
@@ -10,7 +10,7 @@ class RewardTracker:
         Initialization
 
         Parameters:
-        name            :  Name to differentiate between databases if several rewardhandlers are used in the same contract.
+        name            :  Name to differentiate between reward handlers if several reward handlers are used in the same contract.
         db              :  Database instance used to store persistent data.
         isb             :  Contract instance of the contract this class is used in.
         rscore_decimals :  Rscore is the unit rewards are measured in. A decimal value of 18 means 1 loop = 10**18 rscore.
@@ -34,17 +34,17 @@ class RewardTracker:
             reward_rate = reward_rate + (self._loop_to_rscore(amount) // total_eligible_supply)
             self._reward_rate.set(reward_rate)
         else:
-            revert("Total supply is zero.")
+            revert("Total eligible supply is zero.")
 
     def claim_rewards(self, address: Address, eligible_balance: int) -> int:
         """
         Computes all rewards the user has accumulated, deducts them from the reward tracker and
-        returns the accumulated rewards. It's up to the imlpementer to implement the way these rewards end up 
+        returns the accumulated amount. It's up to the imlpementer to implement the way these rewards end up 
         with the end user. E.g. mint or transfer.
 
         Parameters:
         address           :  Address which will claim the rewards.
-        eligible_balance  :  Number of tokens, at this point in time, the address has that are eligible for rewards.
+        eligible_balance  :  Number of tokens the address has that are eligible for rewards.
         """
         self.update_rewards(address, eligible_balance)
 
@@ -69,7 +69,7 @@ class RewardTracker:
     def update_rewards(self, address: Address, eligible_balance: int):
         """
         Computes all rewards up to this point in time and records them. Next, the entry reward is updated to the current
-        reward rate. ALWAYS use this method before changing the eligible balance of an address (E.g. before
+        reward rate sum. ALWAYS use this method before changing the eligible balance of an address (E.g. before
         staking and unstaking in the irc2 contract) If this is not done the reward tracking will not be accurate.
 
         Parameters
