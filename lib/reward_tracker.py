@@ -36,7 +36,6 @@ class RewardTracker:
         else:
             revert("Total supply is zero.")
 
-    # Add mint/transfer argument?
     def claim_rewards(self, address: Address, eligible_balance: int) -> int:
         """
         Computes all rewards the user has accumulated, deducts them from the reward tracker and
