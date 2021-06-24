@@ -1,16 +1,11 @@
 from iconservice import *
 
-class TokenType:
-    irc2 = 1
-    icx = 2
-
-class RewardHandler:
+class RewardTracker:
     """
-    Handles distribution, tracking, and claiming of rewards. Both irc2 token rewards and icx rewards are supported.
-    Used within the contract that keeps track of eligible balances.
+    Handles reward distributiona and reward tracking. Used within the contract that keeps track of rewards eligible balances.
     """
 
-    def __init__(self, name: str, db: IconScoreDatabase, isb: IconScoreBase, rscore_decimals: int = 18, token_type: TokenType = TokenType.irc2):
+    def __init__(self, name: str, db: IconScoreDatabase, isb: IconScoreBase, rscore_decimals: int = 18):
         """
         Initialization
 
@@ -18,15 +13,13 @@ class RewardHandler:
         name            :  Name to differentiate between databases if several rewardhandlers are used in the same contract.
         db              :  Database instance used to store persistent data.
         isb             :  Contract instance of the contract this class is used in.
-        rscore_decimals :  Specifies how small unit rewards should be measured in.
-        token_type      :  Specifies which type of token the rewards are in.
+        rscore_decimals :  Rscore is the unit rewards are measured in. A decimal value of 18 means 1 loop = 10**18 rscore.
         """
-        self._reward_rate = VarDB(f"{name}_sum_reward_rate", db, int)
-        self._entry_reward_rate = DictDB(f"{name}_entry_reward_rate", db, int)
+        self._reward_rate = VarDB(f"{name}_reward_rate_sum", db, int)
+        self._entry_reward_rate = DictDB(f"{name}_entry_reward_rate_sum", db, int)
         self._rewards = DictDB(f"{name}_rewards", db, int)
         self._rscore_decimals = rscore_decimals
         self._isb = isb
-        self._token_type = token_type
 
     def distribute_rewards(self, amount: int, total_eligible_supply: int):
         """
@@ -43,32 +36,29 @@ class RewardHandler:
         else:
             revert("Total supply is zero.")
 
-    def claim_rewards(self, address: Address, eligible_balance: int):
+    # Add mint/transfer argument?
+    def claim_rewards(self, address: Address, eligible_balance: int) -> int:
         """
-        Claim rewards.
+        Computes all rewards the user has accumulated, deducts them from the reward tracker and
+        returns the accumulated rewards. It's up to the imlpementer to implement the way these rewards end up 
+        with the end user. E.g. mint or transfer.
 
         Parameters:
-        address  :  Address which will claim the rewards.
+        address           :  Address which will claim the rewards.
         eligible_balance  :  Number of tokens, at this point in time, the address has that are eligible for rewards.
         """
         self.update_rewards(address, eligible_balance)
+
         rewards = self._rscore_to_loop(self._rewards[address])
         if not rewards:
             revert("No rewards to claim.")
 
-        if self._token_type == TokenType.irc2:
-            self._isb.mint(address, rewards)
-        elif self._token_type == TokenType.icx:
-            self._isb.icx.transfer(address, rewards)
-        else:
-            revert("Tokentype not supported.")
-
-        self._isb.icx.transfer(address, rewards)
         self._rewards[address] -= self._loop_to_rscore(rewards)
+        return rewards
 
     def query_rewards(self, address: Address, eligible_balance: int) -> int:
         """
-        Query the rewards avaiable for this address to claim.
+        Query rewards available for this address to claim.
 
         Parameters:
         address           :  Address to query rewards for.
@@ -80,7 +70,7 @@ class RewardHandler:
     def update_rewards(self, address: Address, eligible_balance: int):
         """
         Computes all rewards up to this point in time and records them. Next, the entry reward is updated to the current
-        reward rate. ALWAYS use this method before changing the eligible balance of an address (for example before
+        reward rate. ALWAYS use this method before changing the eligible balance of an address (E.g. before
         staking and unstaking in the irc2 contract) If this is not done the reward tracking will not be accurate.
 
         Parameters

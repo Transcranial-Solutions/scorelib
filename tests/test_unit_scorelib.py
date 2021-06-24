@@ -81,7 +81,15 @@ class TestSCORELib(ScoreTestCase):
         self.assertEqual(rewards, 2 * 10**19 * 10**18)
     
     def test_claim_rewards(self):
-        print(self.get_balance(self.test_account1))
-        #self.reward_handler.distribute_rewards(self.distribution_amount, self.total_supply)
-        #self.reward_handler.claim_rewards(self.test_account1, 10 ** 21)
-        #print(self.get_balance(self.test_account1))
+
+        # Check if correct rewards are returned with claim_rewards.
+        self.reward_handler.distribute_rewards(self.distribution_amount, self.total_supply)
+        rewards_1 = self.reward_handler.query_rewards(self.test_account1, 10 ** 21)
+        rewards_2 = self.reward_handler.claim_rewards(self.test_account1, 10 ** 21)
+        self.assertEqual(rewards_1, rewards_2)
+
+        # Check if rewards are deducted after claim_rewards.
+        rewards_3 = self.reward_handler.query_rewards(self.test_account1, 10 ** 21)
+        self.assertEqual(rewards_3, 0)
+        
+        

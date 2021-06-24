@@ -1,14 +1,12 @@
 from iconservice import *
-from scorelib.lib.reward_handler import RewardHandler, TokenType
-
+from scorelib.lib.reward_tracker import RewardTracker
 TAG = 'SCORELib'
-
 
 class SCORELib(IconScoreBase):
 
     def __init__(self, db: IconScoreDatabase) -> None:
         super().__init__(db)
-        self._reward_handler = RewardHandler("rewards", 18, db, self, token_type=TokenType.icx)
+        self._reward_handler = RewardTracker("rewards", db, self)
 
     def on_install(self) -> None:
         super().on_install()
