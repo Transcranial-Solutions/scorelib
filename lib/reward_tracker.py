@@ -2,7 +2,7 @@ from iconservice import *
 
 class RewardTracker:
     """
-    Handles reward distribution and reward tracking. Used within the contract that keeps track of reward eligible balances.
+    Handles reward distribution and reward tracking.
     """
 
     def __init__(self, name: str, db: IconScoreDatabase, isb: IconScoreBase, rscore_decimals: int = 18):
