@@ -5,21 +5,19 @@ class RewardTracker:
     Handles reward distribution and reward tracking.
     """
 
-    def __init__(self, name: str, db: IconScoreDatabase, isb: IconScoreBase, rscore_decimals: int = 18):
+    def __init__(self, name: str, db: IconScoreDatabase, rscore_decimals: int = 18):
         """
         Initialization
 
         Parameters:
         name            :  Name to differentiate between reward trackers if several reward trackers are used in the same contract.
         db              :  Database instance used to store persistent data.
-        isb             :  Contract instance of the contract this class is used in.
         rscore_decimals :  Rscore is the unit rewards are measured in. A decimal value of 18 means 1 loop = 10**18 rscore.
         """
         self._reward_rate = VarDB(f"{name}_reward_rate_sum", db, int)
         self._entry_reward_rate = DictDB(f"{name}_entry_reward_rate_sum", db, int)
         self._rewards = DictDB(f"{name}_rewards", db, int)
         self._rscore_decimals = rscore_decimals
-        self._isb = isb
 
     def distribute_rewards(self, amount: int, total_eligible_supply: int):
         """
