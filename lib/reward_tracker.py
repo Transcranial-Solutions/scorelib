@@ -34,14 +34,14 @@ class RewardTracker:
         else:
             revert("Total eligible supply is zero.")
 
-    def claim_rewards(self, address: Address, eligible_balance: int) -> int:
+    def withdraw_rewards(self, address: Address, eligible_balance: int) -> int:
         """
-        Computes all rewards the user has accumulated, deducts them from the reward tracker and
-        returns the accumulated amount. It's up to the imlpementer to implement the way these rewards end up 
+        Computes all rewards for an address, deducts them from the reward tracker and
+        returns the accumulated amount. It's up to the implementer to implement the way these rewards end up 
         with the end user. E.g. mint or transfer.
 
         Parameters:
-        address           :  Address which will claim the rewards.
+        address           :  Address from which to withdraw rewards.
         eligible_balance  :  Number of tokens the address has that are eligible for rewards.
         """
         self.update_rewards(address, eligible_balance)
