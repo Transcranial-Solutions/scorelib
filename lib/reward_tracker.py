@@ -10,7 +10,7 @@ class RewardTracker:
         Initialization
 
         Parameters:
-        name            :  Name to differentiate between reward handlers if several reward handlers are used in the same contract.
+        name            :  Name to differentiate between reward trackers if several reward trackers are used in the same contract.
         db              :  Database instance used to store persistent data.
         isb             :  Contract instance of the contract this class is used in.
         rscore_decimals :  Rscore is the unit rewards are measured in. A decimal value of 18 means 1 loop = 10**18 rscore.
