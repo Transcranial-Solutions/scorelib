@@ -66,7 +66,7 @@ class RewardTracker:
 
     def update_rewards(self, address: Address, eligible_balance: int):
         """
-        Computes all rewards up to this point in time and records them. Next, the entry reward is updated to the current
+        Computes all rewards of an address up to this point in time and records them. Next, the entry reward is updated to the current
         reward rate sum. ALWAYS use this method before changing the eligible balance of an address (E.g. before
         staking and unstaking in the irc2 contract) If this is not done the reward tracking will not be accurate.
 
