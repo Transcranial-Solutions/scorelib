@@ -2,7 +2,8 @@ from iconservice import *
 
 class RewardTracker:
     """
-    Handles reward distribution and reward tracking.
+    Handles reward distribution and reward tracking in a senario where users are eligible for rewards 
+    proportional their share of a certain asset.
     """
 
     def __init__(self, name: str, db: IconScoreDatabase, rscore_decimals: int = 18):
@@ -66,12 +67,12 @@ class RewardTracker:
 
     def update_rewards(self, address: Address, eligible_balance: int):
         """
-        Computes all rewards of an address up to this point in time and records them. Next, the entry reward is updated to the current
-        reward rate sum. ALWAYS use this method before changing the eligible balance of an address (E.g. before
-        staking and unstaking in an irc2 contract) If this is not done the reward tracking will not be accurate.
+        Computes and stores rewards earned form differences in entry and current reward rate. Next, the 
+        entry reward rate sum is updated to the current reward rate sum. This MUST be done
+        before changing the eligible supply of a user. If not, reward tracking will not be accurate.
 
         Parameters
-        address           :  Address to update rewards on.
+        address           :  Address to sync rewards for.
         eligible_balance  :  Number of tokens, at this point in time, the address has that are eligible for rewards.
         """
         rewards = eligible_balance * (self._reward_rate.get() - self._entry_reward_rate[address])

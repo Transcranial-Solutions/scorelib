@@ -6,7 +6,7 @@ class SCORELib(IconScoreBase):
 
     def __init__(self, db: IconScoreDatabase) -> None:
         super().__init__(db)
-        self._reward_handler = RewardTracker("rewards", db, self)
+        self._reward_handler = RewardTracker("rewards", db)
 
     def on_install(self) -> None:
         super().on_install()
