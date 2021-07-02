@@ -67,9 +67,9 @@ class RewardTracker:
 
     def update_rewards(self, address: Address, eligible_balance: int):
         """
-        Computes and stores rewards earned form differences in entry and current reward rate. Next, the 
-        entry reward rate sum is updated to the current reward rate sum. This MUST be done
-        before changing the eligible supply of a user. If not, reward tracking will not be accurate.
+        A users rewards up to this point are tallied.The entry reward rate sum is updated to the current
+        reward rate sum. This MUST be done before changing the eligible supply of a user. 
+        If not, reward tracking will not be accurate.
 
         Parameters
         address           :  Address to sync rewards for.
