@@ -6,7 +6,7 @@ class RewardTracker:
     proportional their share of a certain asset.
     """
 
-    def __init__(self, name: str, db: IconScoreDatabase, rscore_decimals: int = 18):
+    def __init__(self, name: str, db: IconScoreDatabase, rscore_decimals: int = 18, distribution_threshold: int = 0):
         """
         Initialization
 
@@ -18,6 +18,8 @@ class RewardTracker:
         self._reward_rate = VarDB(f"{name}_reward_rate_sum", db, int)
         self._entry_reward_rate = DictDB(f"{name}_entry_reward_rate_sum", db, int)
         self._rewards = DictDB(f"{name}_rewards", db, int)
+        self._distribution_threshold = VarDB(f"{name}_distribution_threshold", db, int)
+        self._undistributed = VarDB(f"{name}_undistributed", db, int)
         self._rscore_decimals = rscore_decimals
 
     def distribute_rewards(self, amount: int, total_eligible_supply: int):
@@ -28,6 +30,11 @@ class RewardTracker:
         amount                 :  Amount of tokens to distribute.
         total_eligible_supply  :  Total amount of tokens eligible for rewards.
         """
+        distribution_amount = amount + self._undistributed.get()
+        if distribution_amount < self._distribution_threshold.get():
+            self._undistributed.set(distribution_amount)
+            return
+
         reward_rate = self._reward_rate.get()
         if total_eligible_supply:
             reward_rate = reward_rate + (self._loop_to_rscore(amount) // total_eligible_supply)
