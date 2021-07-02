@@ -18,6 +18,7 @@ class RewardTracker:
         self._reward_rate = VarDB(f"{name}_reward_rate_sum", db, int)
         self._entry_reward_rate = DictDB(f"{name}_entry_reward_rate_sum", db, int)
         self._rewards = DictDB(f"{name}_rewards", db, int)
+        self._rest = VarDB(f"{name}_rest", db, int)
         self._rscore_decimals = rscore_decimals
 
     def distribute_rewards(self, amount: int, total_eligible_supply: int):
@@ -29,9 +30,13 @@ class RewardTracker:
         total_eligible_supply  :  Total amount of tokens eligible for rewards.
         """
         reward_rate = self._reward_rate.get()
+        rest = self._rest.get()
         if total_eligible_supply:
-            reward_rate = reward_rate + (self._loop_to_rscore(amount) // total_eligible_supply)
+            reward_rate = reward_rate + ((self._loop_to_rscore(amount) + rest) // total_eligible_supply)
             self._reward_rate.set(reward_rate)
+            rest = (self._loop_to_rscore(amount) + rest) % total_eligible_supply
+            self._rest.set(rest)
+
         else:
             revert("Total eligible supply is zero.")
 
